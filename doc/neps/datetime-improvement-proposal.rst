@@ -35,24 +35,28 @@ Possible Solutions
 After much discussion within the numpy community, it looks like there are four possible solutions to deal with this issue:
 
 1) Naive datetime64: A naive datetime64 would be the simplest possible solution, where there is no timezone handling at all. Everything is assumed to be in the UTC internally, or alternatively all data is in the same time zone. I/O will have no offset and produce an object without tzinfo. If a datetime64 object is created with a timezone offset, we throw an error that states that numpy cannot currently handle timezone offsets.
+ 
+Example bhaviour::
 
-```>>> np.datetime64('2005-02-25T03:00')
-np.datetime64('2005-02-25T03:00')
+	>>> np.datetime64('2005-02-25T03:00')
+	np.datetime64('2005-02-25T03:00')
 
->>> np.datetime64('2005-02-25T03:00Z')
-np.datetime64('2005-02-25T03:00')
+	>>> np.datetime64('2005-02-25T03:00Z')
+	np.datetime64('2005-02-25T03:00')
 
->>>np.datetime64('2005-02-25T03:00+0500')
-TZException: numpy does not currently handle tzinfo in datetime64 objects```
+	>>> np.datetime64('2005-02-25T03:00+0500')
+	TZException: numpy does not currently handle tzinfo in datetime64 objects
 
 2) UTC datetime64: This would be very similar to the above, expect everything would be in UTC internally and it would assume UTC if no tzinfo is provided. If it is provided then, the tzinfo is respected but stored as UTC internally. On output UTC is used, no offset computed.
 
-```>>> np.datetime64('2005-02-25T03:00')
-np.datetime64('2005-02-25T03:00Z')
+Example behaviour::
 
-np.datetime64('2005-02-25T03:00+0500')
-np.datetime64('2005-02-25T08:00Z')
-```
+	>>> np.datetime64('2005-02-25T03:00')
+	np.datetime64('2005-02-25T03:00Z')
+
+	>>> np.datetime64('2005-02-25T03:00+0500')
+	np.datetime64('2005-02-25T08:00Z')
+
 3) Optional timezone support: This approach would be completely analogous to the approach taken by the stdlib datetime.
 
 Suggested improvement
