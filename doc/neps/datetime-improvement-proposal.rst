@@ -36,7 +36,7 @@ After much discussion within the numpy community, it looks like there are four p
 
 1) Naive datetime64: A naive datetime64 would be the simplest possible solution, where there is no timezone handling at all. Everything is assumed to be in the UTC internally, or alternatively all data is in the same time zone. I/O will have no offset and produce an object without tzinfo. If a datetime64 object is created with a timezone offset, we throw an error that states that numpy cannot currently handle timezone offsets.
  
-Example bhaviour::
+Example behaviour::
 
 	>>> np.datetime64('2005-02-25T03:00')
 	np.datetime64('2005-02-25T03:00')
@@ -54,16 +54,17 @@ Example behaviour::
 	>>> np.datetime64('2005-02-25T03:00')
 	np.datetime64('2005-02-25T03:00Z')
 
-	>>> np.datetime64('2005-02-25T03:00+0500')
+	>>> np.datetime64('2005-02-25T03:00-0500')
 	np.datetime64('2005-02-25T08:00Z')
 
-3) Optional timezone support: This approach would be completely analogous to the approach taken by the stdlib datetime.
+3) Optional timezone support: This approach would be completely analogous to the approach taken by the stdlib datetime. It would provide a hook for a tzinfo object and handle it in the same way the standard library does. I have not included examples here since further discussion would be required on how exactly this would operate.
+
+4) Full timezone support: Every array would be required to carry timezone info. This would require a dedicated tzinfo package to be included and maintained in numpy, something which doesn't seem to be warranted right now.
 
 Suggested improvement
 =====================
-The suggested improvement involves implementing a function to accept an iso string or a `datetime.datetime` object as UTC with an optional flag to provide tzinfo, so as not to confuse applications that expect a naive datetime without any time zone info. UTC is used for output, with no offset. The internal storage would be in UTC.
+The current suggested improvement would be the simplest possible fix, which would be the naive datetime solution (solution 1). In the discussion in the threads about this problem, this seems to be the least objectionable approach, as well as possibly the most implementable. Since we need to handle the I/O problems currently faced, this would be the best way to ensure those problems are fixed and improvements on this can be made later. This also seems to be compatible with pandas and hence would be the most acceptable to the numeric community at large.
 
-This fix is simplistic and avoids having to include a comprehensive tzinfo package which would be required if complete timezone support were to be implemented. Furthermore this would likely involve a dip in perfomance since it would require heavy interaction with the python layer for each operation. This could be incorporated in the future, since the proposed fix could easily be extended without jeopardizing the option of providing complete support at a later time.
 
 
 .. [1] http://article.gmane.org/gmane.comp.python.numeric.general/53805
