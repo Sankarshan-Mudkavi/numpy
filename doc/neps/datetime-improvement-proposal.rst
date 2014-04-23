@@ -87,6 +87,7 @@ whereas::
   Out[12]: True
 
 Comparisons with valid datetimes can be surprising, also::
+
   In [17]: np.datetime64('NaT') < np.datetime64('2011-01-01')
   Out[17]: True
 
